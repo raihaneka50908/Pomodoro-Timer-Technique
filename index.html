@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>DevFocus</title>
+<style>
+  :root {
+    --bg: #FAFAF9;
+    --surface: #FFFFFF;
+    --surface-2: #F2F1ED;
+    --text: #1C1C1F;
+    --text-secondary: #68676D;
+    --border: #E4E2DD;
+    --border-strong: #CFCDC6;
+    --focus-accent: #4F5DEA;
+    --focus-accent-soft: #EAEBFC;
+    --short-accent: #2E9E6D;
+    --short-accent-soft: #E4F5EC;
+    --long-accent: #B9791E;
+    --long-accent-soft: #FBF0DE;
+    --accent: var(--focus-accent);
+    --accent-soft: var(--focus-accent-soft);
+    --ring-track: #E9E7E1;
+    --focus-ring-color: #2A46E8;
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow-1: 0 1px 2px rgba(20,20,25,0.05), 0 6px 16px rgba(20,20,25,0.04);
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --dur: 160ms;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="system"] {
+      --bg: #17171B;
+      --surface: #1F1F25;
+      --surface-2: #26262D;
+      --text: #ECECEE;
+      --text-secondary: #9F9EA6;
+      --border: #313138;
+      --border-strong: #3E3E47;
+      --focus-accent: #8791F5;
+      --focus-accent-soft: #262A4A;
+      --short-accent: #5BC796;
+      --short-accent-soft: #1E332A;
+      --long-accent: #E0A94E;
+      --long-accent-soft: #3A2E17;
+      --ring-track: #2C2C33;
+      --focus-ring-color: #A9B3FF;
+      --shadow-1: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17171B;
+    --surface: #1F1F25;
+    --surface-2: #26262D;
+    --text: #ECECEE;
+    --text-secondary: #9F9EA6;
+    --border: #313138;
+    --border-strong: #3E3E47;
+    --focus-accent: #8791F5;
+    --focus-accent-soft: #262A4A;
+    --short-accent: #5BC796;
+    --short-accent-soft: #1E332A;
+    --long-accent: #E0A94E;
+    --long-accent-soft: #3A2E17;
+    --ring-track: #2C2C33;
+    --focus-ring-color: #A9B3FF;
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.25);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body[data-mode="focus"]   { --accent: var(--focus-accent); --accent-soft: var(--focus-accent-soft); }
+  body[data-mode="short"]   { --accent: var(--short-accent); --accent-soft: var(--short-accent-soft); }
+  body[data-mode="long"]    { --accent: var(--long-accent); --accent-soft: var(--long-accent-soft); }
+
+  button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.05em 0.45em;
+  }
+
+  #app { max-width: 880px; margin: 0 auto; padding: 0 20px 64px; }
+
+  /* Header */
+  header.top {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 0 16px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: baseline; gap: 8px; margin-right: auto; }
+  .brand-mark {
+    width: 10px; height: 10px; border-radius: 3px; background: var(--accent);
+    display: inline-block; transition: background var(--dur) ease;
+  }
+  @media (prefers-reduced-motion: reduce) { .brand-mark { transition: none; } }
+  .brand-name { font-weight: 600; letter-spacing: -0.01em; font-size: 1.05rem; }
+
+  nav.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: var(--radius); border: 1px solid var(--border); }
+  nav.tabs button {
+    border: none; background: transparent; color: var(--text-secondary);
+    padding: 7px 14px; border-radius: calc(var(--radius) - 3px); font-weight: 500;
+  }
+  nav.tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); }
+
+  .header-actions { display: flex; gap: 6px; }
+  .icon-btn {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary);
+    width: 34px; height: 34px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Timer view */
+  .timer-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 36px 24px 28px; box-shadow: var(--shadow-1);
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    margin-top: 8px;
+  }
+  .mode-label {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 600; font-size: 0.95rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .mode-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .ring-wrap { position: relative; width: min(280px, 62vw); height: min(280px, 62vw); }
+  .ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--ring-track); stroke-width: 10; }
+  .ring-progress { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 280ms linear, stroke 200ms ease; }
+  @media (prefers-reduced-motion: reduce) { .ring-progress { transition: none; } }
+  .ring-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .time-readout { font-family: var(--font-mono); font-size: clamp(2.4rem, 9vw, 3.4rem); font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .time-sub { font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); }
+
+  .active-task-line { font-size: 0.9rem; color: var(--text-secondary); text-align: center; min-height: 1.3em; }
+  .active-task-line strong { color: var(--text); font-weight: 600; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .btn {
+    border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface);
+    padding: 10px 18px; font-weight: 600; font-size: 0.92rem;
+  }
+  .btn:hover { border-color: var(--text-secondary); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn-quiet { background: transparent; border-color: transparent; color: var(--text-secondary); }
+  .btn-quiet:hover { color: var(--text); background: var(--surface-2); }
+  .btn-ghost { background: var(--surface-2); border: 1px solid var(--border); }
+  .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+  .btn-icon { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); width: 30px; height: 30px; display:flex; align-items:center; justify-content:center; }
+  .btn-icon:disabled { opacity: 0.35; cursor: default; }
+
+  .preset-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .preset-select { padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); }
+
+  .inline-panel {
+    width: 100%; max-width: 420px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+    font-size: 0.9rem;
+  }
+  .inline-panel .row-buttons { display: flex; gap: 8px; }
+  .inline-panel p { margin: 0; color: var(--text-secondary); }
+  .inline-panel textarea, .inline-panel input[type="text"] {
+    width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    padding: 8px 10px; background: var(--surface); resize: vertical; min-height: 38px;
+  }
+
+  .cycle-note { font-size: 0.82rem; color: var(--text-secondary); text-align: center; font-family: var(--font-mono); }
+  .status-note { font-size: 0.82rem; color: var(--text-secondary); text-align: center; max-width: 420px; }
+
+  /* Tasks view */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-1); margin-top: 8px; }
+  .panel h2 { margin: 0 0 14px; font-size: 1rem; }
+  .panel + .panel { margin-top: 16px; }
+
+  .task-form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .task-form input[type="text"] { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .task-form input[type="number"] { width: 92px; padding: 9px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .task-form select { padding: 9px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); }
+
+  ul#task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .task-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
+  }
+  .task-row.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .task-row.is-done .task-title { text-decoration: line-through; color: var(--text-secondary); }
+  .task-drag-handle { background: none; border: none; color: var(--text-secondary); cursor: grab; padding: 2px 4px; }
+  .task-main { flex: 1; min-width: 0; }
+  .task-title { font-weight: 500; overflow-wrap: anywhere; }
+  .task-meta { display: flex; gap: 8px; align-items: center; margin-top: 3px; font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); }
+  .tag { font-family: var(--font-ui); border: 1px solid var(--border-strong); border-radius: 999px; padding: 1px 9px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .task-order-btns { display: flex; gap: 4px; }
+  .empty-state { color: var(--text-secondary); padding: 18px 8px; text-align: center; font-size: 0.92rem; }
+
+  /* Stats view */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 14px; }
+  .stat-tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .stat-tile .num { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 600; }
+  .stat-tile .label { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+
+  .chart-wrap { overflow-x: auto; }
+  svg.chart { display: block; }
+  .chart text { fill: var(--text-secondary); font-family: var(--font-mono); font-size: 10px; }
+  .chart .bar { fill: var(--accent); }
+  .chart .bar-track { fill: var(--ring-track); }
+  .chart .bar-internal { fill: var(--focus-accent); }
+  .chart .bar-external { fill: var(--text-secondary); opacity: 0.55; }
+
+  .legend { display: flex; gap: 16px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; flex-wrap: wrap; }
+  .legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+  .heatmap-row { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; }
+  .heatmap-cell { aspect-ratio: 1; border-radius: 3px; background: var(--ring-track); }
+  .heatmap-hours { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; margin-top: 4px; }
+  .heatmap-hours span { font-size: 0.6rem; color: var(--text-secondary); text-align: center; font-family: var(--font-mono); }
+
+  /* Settings view */
+  .settings-grid { display: grid; gap: 18px; }
+  .field-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .field-row:last-child { border-bottom: none; }
+  .field-row label.field-title { font-weight: 500; }
+  .field-hint { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; display: block; }
+  .field-control { display: flex; align-items: center; gap: 8px; }
+  .field-control input[type="number"] { width: 68px; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .preset-edit-grid { display: grid; grid-template-columns: 90px repeat(3, 1fr); gap: 8px; align-items: center; font-size: 0.85rem; }
+  .preset-edit-grid input { width: 100%; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); }
+  .preset-edit-grid .hdr { color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; }
+
+  .switch { position: relative; width: 40px; height: 22px; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin:0; cursor: pointer; }
+  .switch .track { position: absolute; inset: 0; background: var(--ring-track); border-radius: 999px; border: 1px solid var(--border-strong); transition: background var(--dur); }
+  .switch .thumb { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,0.3); transition: transform var(--dur); }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track + .thumb { transform: translateX(18px); }
+  @media (prefers-reduced-motion: reduce) { .switch .track, .switch .thumb { transition: none; } }
+
+  select.theme-select, select.settings-select { padding: 7px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); }
+
+  .danger-zone { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .confirm-row { display: flex; gap: 8px; align-items: center; }
+
+  /* Shortcuts overlay */
+  .overlay-backdrop {
+    position: fixed; inset: 0; background: rgba(20,20,22,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .overlay-box { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 24px; max-width: 420px; width: 100%; box-shadow: var(--shadow-1); }
+  .overlay-box h2 { margin-top: 0; }
+  .shortcut-list { display: grid; grid-template-columns: auto 1fr; gap: 10px 14px; margin: 16px 0; font-size: 0.9rem; }
+  [hidden] { display: none !important; }
+
+  footer.app-footer { text-align: center; color: var(--text-secondary); font-size: 0.78rem; margin-top: 28px; }
+
+  @media (max-width: 560px) {
+    #app { padding: 0 14px 48px; }
+    header.top { gap: 8px; }
+    nav.tabs button { padding: 7px 10px; font-size: 0.85rem; }
+    .preset-edit-grid { grid-template-columns: 70px repeat(3, 1fr); font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body data-mode="focus">
+<div id="app">
+
+  <header class="top">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">DevFocus</span></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" id="tab-timer" aria-controls="view-timer" aria-selected="true" data-view="timer">Timer</button>
+      <button role="tab" id="tab-tasks" aria-controls="view-tasks" aria-selected="false" data-view="tasks">Tasks</button>
+      <button role="tab" id="tab-stats" aria-controls="view-stats" aria-selected="false" data-view="stats">Stats</button>
+      <button role="tab" id="tab-settings" aria-controls="view-settings" aria-selected="false" data-view="settings">Settings</button>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-theme" title="Toggle theme" aria-label="Toggle color theme">◐</button>
+      <button class="icon-btn" id="btn-shortcuts" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts">?</button>
+    </div>
+  </header>
+
+  <div aria-live="polite" class="sr-only" id="live-region"></div>
+
+  <!-- TIMER VIEW -->
+  <section class="view active" id="view-timer" role="tabpanel" aria-labelledby="tab-timer">
+    <div class="timer-card">
+      <div class="preset-row" id="preset-row">
+        <select class="preset-select" id="preset-select" aria-label="Timer preset">
+          <option value="classic">Classic 25/5/15</option>
+          <option value="deep">Deep Work 50/10/30</option>
+          <option value="sprint">Sprint 15/3/10</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="mode-label" id="mode-label"><span class="mode-dot" aria-hidden="true"></span><span id="mode-label-text">Focus</span></div>
+
+      <div class="ring-wrap">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="ring-track" cx="100" cy="100" r="90"></circle>
+          <circle class="ring-progress" id="ring-progress" cx="100" cy="100" r="90"></circle>
+        </svg>
+        <div class="ring-center">
+          <div class="time-readout" id="time-readout">25:00</div>
+          <div class="time-sub" id="time-sub"></div>
+        </div>
+      </div>
+
+      <div class="active-task-line" id="active-task-line"></div>
+
+      <div class="controls" id="controls"></div>
+
+      <div class="inline-panel" id="pause-tag-panel" hidden>
+        <p>You paused. Was that internal (your choice) or external (something outside your control)?</p>
+        <div class="row-buttons">
+          <button class="btn btn-ghost" id="btn-tag-internal">Internal</button>
+          <button class="btn btn-ghost" id="btn-tag-external">External</button>
+        </div>
+      </div>
+
+      <div class="inline-panel" id="flow-guard-panel" hidden>
+        <p id="flow-guard-text">Session done — still in flow?</p>
+        <div class="row-buttons">
+          <button class="btn btn-primary" id="btn-take-break">Take the break</button>
+          <button class="btn btn-ghost" id="btn-extend">+10 min (I'm mid-thought)</button>
+        </div>
+      </div>
+
+      <div class="inline-panel" id="interrupt-panel" hidden>
+        <p>Log an interruption. A note is optional — only add one if you want to.</p>
+        <textarea id="interrupt-note" rows="1" placeholder="Optional note…"></textarea>
+        <div class="row-buttons">
+          <button class="btn btn-ghost" id="btn-interrupt-internal">Internal — I got distracted</button>
+          <button class="btn btn-ghost" id="btn-interrupt-external">External — something pinged me</button>
+        </div>
+      </div>
+
+      <p class="status-note" id="status-note"></p>
+      <p class="cycle-note" id="cycle-note"></p>
+    </div>
+  </section>
+
+  <!-- TASKS VIEW -->
+  <section class="view" id="view-tasks" role="tabpanel" aria-labelledby="tab-tasks" hidden>
+    <div class="panel">
+      <h2>Add a task</h2>
+      <form class="task-form" id="task-form">
+        <input type="text" id="task-title-input" placeholder="What are you working on?" aria-label="Task title" required maxlength="200">
+        <input type="number" id="task-estimate-input" placeholder="Est." min="0" max="99" aria-label="Estimated pomodoros">
+        <select id="task-tag-input" aria-label="Tag">
+          <option value="">No tag</option>
+          <option value="bug">Bug</option>
+          <option value="feature">Feature</option>
+          <option value="review">Review</option>
+          <option value="learning">Learning</option>
+          <option value="ops">Ops</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Add task</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Tasks</h2>
+      <ul id="task-list"></ul>
+    </div>
+  </section>
+
+  <!-- STATS VIEW -->
+  <section class="view" id="view-stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+    <div class="panel">
+      <h2>Today</h2>
+      <div class="stat-grid" id="today-stats"></div>
+    </div>
+    <div class="panel">
+      <h2>Last 7 days — focus minutes</h2>
+      <div class="chart-wrap" id="week-chart"></div>
+    </div>
+    <div class="panel">
+      <h2>Time-of-day heatmap</h2>
+      <div id="heatmap"></div>
+    </div>
+    <div class="panel">
+      <h2>Estimation accuracy</h2>
+      <div id="estimation-block"></div>
+    </div>
+    <div class="panel">
+      <h2>Integrity</h2>
+      <div class="stat-grid" id="integrity-stats"></div>
+      <div class="chart-wrap" id="integrity-chart" style="margin-top:16px;"></div>
+      <div class="legend">
+        <span><span class="legend-swatch" style="background:var(--focus-accent)"></span>Internal violations — a habit signal</span>
+        <span><span class="legend-swatch" style="background:var(--text-secondary);opacity:.55"></span>External events — an environment signal</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS VIEW -->
+  <section class="view" id="view-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+    <div class="panel">
+      <h2>Preset durations (minutes)</h2>
+      <div class="preset-edit-grid" id="preset-edit-grid">
+        <span></span><span class="hdr">Focus</span><span class="hdr">Short</span><span class="hdr">Long</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="settings-grid">
+        <div class="field-row">
+          <div><label class="field-title" for="setting-sessions-until-long">Sessions until long break</label><span class="field-hint">How many focus sessions before a long break is offered.</span></div>
+          <div class="field-control"><input type="number" id="setting-sessions-until-long" min="2" max="12"></div>
+        </div>
+        <div class="field-row">
+          <div><label class="field-title" for="setting-autostart">Auto-start next session</label><span class="field-hint">Skip the waiting step between break and focus.</span></div>
+          <div class="field-control">
+            <span class="switch"><input type="checkbox" id="setting-autostart"><span class="track"></span><span class="thumb"></span></span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div><label class="field-title" for="setting-sound">Sound</label><span class="field-hint">A short chime when a session or break ends.</span></div>
+          <div class="field-control">
+            <input type="range" id="setting-volume" min="0" max="1" step="0.05" aria-label="Volume">
+            <span class="switch"><input type="checkbox" id="setting-sound"><span class="track"></span><span class="thumb"></span></span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div><label class="field-title" for="setting-notifications">Notifications</label><span class="field-hint">Ask your browser for permission on first use.</span></div>
+          <div class="field-control">
+            <span class="switch"><input type="checkbox" id="setting-notifications"><span class="track"></span><span class="thumb"></span></span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div><label class="field-title" for="setting-theme">Theme</label><span class="field-hint">Follows your system by default.</span></div>
+          <div class="field-control">
+            <select id="setting-theme" class="theme-select">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Data</h2>
+      <div class="settings-grid">
+        <div class="field-row">
+          <div><span class="field-title">Export</span><span class="field-hint">Download everything as a JSON file.</span></div>
+          <div class="field-control"><button class="btn btn-ghost" id="btn-export">Export data</button></div>
+        </div>
+        <div class="field-row">
+          <div><span class="field-title">Import</span><span class="field-hint">Replace current data from a previously exported file.</span></div>
+          <div class="field-control">
+            <input type="file" id="import-file" accept="application/json" class="sr-only">
+            <button class="btn btn-ghost" id="btn-import">Import data</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="danger-zone">
+            <span class="field-title">Reset all data</span>
+            <span class="field-hint">Deletes tasks, logs, and settings on this device. Cannot be undone.</span>
+            <button class="btn btn-ghost" id="btn-reset">Reset all data</button>
+            <div class="confirm-row" id="reset-confirm-row" hidden>
+              <span>Erase everything?</span>
+              <button class="btn btn-primary btn-sm" id="btn-reset-confirm">Yes, erase everything</button>
+              <button class="btn btn-quiet btn-sm" id="btn-reset-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app-footer">DevFocus runs entirely in this browser tab. No accounts, no server, no tracking.</footer>
+</div>
+
+<div class="overlay-backdrop" id="shortcuts-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+  <div class="overlay-box">
+    <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+    <div class="shortcut-list">
+      <kbd>Space</kbd><span>Start / pause / resume</span>
+      <kbd>A</kbd><span>Abandon session (confirms first)</span>
+      <kbd>S</kbd><span>Skip break</span>
+      <kbd>I</kbd><span>Log an interruption</span>
+      <kbd>N</kbd><span>New task</span>
+      <kbd>?</kbd><span>Toggle this overlay</span>
+      <kbd>Esc</kbd><span>Close overlays and prompts</span>
+    </div>
+    <button class="btn btn-primary" id="btn-close-shortcuts">Close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "devfocus.v1";
+  var TAGS = ["bug","feature","review","learning","ops"];
+
+  function uid(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+  function round1(n){ return Math.round(n*10)/10; }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function startOfDay(ts){ var d = new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }
+  function isSameDay(ts, ref){ return startOfDay(ts) === startOfDay(ref); }
+  function fmtMMSS(ms){
+    var totalSec = Math.max(0, Math.round(ms/1000));
+    var m = Math.floor(totalSec/60), s = totalSec % 60;
+    return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  }
+
+  // ---------- State ----------
+  function defaultState(){
+    return {
+      version: 1,
+      settings: {
+        presets: {
+          classic: { focus:25, short:5, long:15 },
+          deep:    { focus:50, short:10, long:30 },
+          sprint:  { focus:15, short:3, long:10 },
+          custom:  { focus:25, short:5, long:15 }
+        },
+        activePreset: "classic",
+        sessionsUntilLongBreak: 4,
+        autoStartNext: false,
+        soundOn: false,
+        volume: 0.5,
+        notificationsOn: false,
+        theme: "system"
+      },
+      session: {
+        phase: "idle", breakKind: null, status: null,
+        targetEndTs: null, remainingMsAtPause: null, pausedAt: null,
+        pauseAwaitingTag: false, focusGuardOvertimeStartTs: null, breakOverStartTs: null,
+        record: null, cycleCount: 0, interruptPopoverOpen: false
+      },
+      tasks: [],
+      log: [],
+      interruptionLog: [],
+      flowExtensionLog: []
+    };
+  }
+
+  function migrateState(parsed){
+    var def = defaultState();
+    if(!parsed || typeof parsed !== "object") return def;
+    var out = def;
+    try {
+      if(parsed.settings && typeof parsed.settings === "object"){
+        out.settings = Object.assign({}, def.settings, parsed.settings);
+        out.settings.presets = Object.assign({}, def.settings.presets);
+        if(parsed.settings.presets && typeof parsed.settings.presets === "object"){
+          Object.keys(def.settings.presets).forEach(function(k){
+            if(parsed.settings.presets[k]) out.settings.presets[k] = Object.assign({}, def.settings.presets[k], parsed.settings.presets[k]);
+          });
+        }
+      }
+      if(parsed.session && typeof parsed.session === "object") out.session = Object.assign({}, def.session, parsed.session);
+      if(Array.isArray(parsed.tasks)) out.tasks = parsed.tasks;
+      if(Array.isArray(parsed.log)) out.log = parsed.log;
+      if(Array.isArray(parsed.interruptionLog)) out.interruptionLog = parsed.interruptionLog;
+      if(Array.isArray(parsed.flowExtensionLog)) out.flowExtensionLog = parsed.flowExtensionLog;
+    } catch(e){ return def; }
+    return out;
+  }
+
+  function loadState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      return migrateState(JSON.parse(raw));
+    } catch(e){
+      console.warn("DevFocus: could not read saved data, starting fresh.", e);
+      return defaultState();
+    }
+  }
+  function saveState(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ /* storage unavailable — degrade silently, in-memory state still works */ }
+  }
+
+  var state = loadState();
+  var session = state.session;
+
+  function getActivePresetDurations(){
+    var key = state.settings.activePreset;
+    return state.settings.presets[key] || state.settings.presets.classic;
+  }
+  function getActiveTaskId(){
+    var t = state.tasks.find(function(t){ return t.active; });
+    return t ? t.id : null;
+  }
+
+  // ---------- Announce ----------
+  function announce(msg){
+    var el = $("#live-region");
+    el.textContent = "";
+    window.setTimeout(function(){ el.textContent = msg; }, 30);
+  }
+
+  // ---------- Audio ----------
+  var audioCtx = null;
+  function ensureAudioCtx(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function playChime(){
+    if(!state.settings.soundOn) return;
+    var ctx = ensureAudioCtx();
+    if(!ctx) return;
+    var now = ctx.currentTime;
+    var gain = ctx.createGain();
+    var vol = clamp(state.settings.volume, 0, 1) * 0.25;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(vol, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+    gain.connect(ctx.destination);
+    [659.25, 880].forEach(function(freq, i){
+      var osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      osc.start(now + i*0.14);
+      osc.stop(now + 1.0);
+    });
+  }
+
+  // ---------- Notifications ----------
+  function notify(title, body){
+    if(!state.settings.notificationsOn) return;
+    if(typeof Notification === "undefined") return;
+    if(Notification.permission === "granted"){
+      try { new Notification(title, { body: body, silent: true }); } catch(e){}
+    }
+  }
+
+  // ---------- Session engine ----------
+  function beginBreak(now){
+    var record = session.record;
+    var willCount = !(record.abandoned || record.forcedVoid);
+    var n = state.settings.sessionsUntilLongBreak || 4;
+    var nextCycleNumber = session.cycleCount + (willCount ? 1 : 0);
+    var isLong = willCount && nextCycleNumber > 0 && (nextCycleNumber % n === 0);
+    var preset = getActivePresetDurations();
+    var plannedBreak = isLong ? preset.long : preset.short;
+    record.plannedBreakMinutes = plannedBreak;
+    record.breakKind = isLong ? "long" : "short";
+    session.phase = "break";
+    session.breakKind = isLong ? "long" : "short";
+    session.targetEndTs = now + plannedBreak * 60000;
+    session.breakOverStartTs = null;
+    persistAndRender();
+    announce((isLong ? "Long" : "Short") + " break started, " + plannedBreak + " minutes.");
+  }
+
+  function pushLogEntry(r){
+    var status = (r.forcedVoid || r.abandoned) ? "void" : (r.internalViolations > 0 ? "flawed" : "clean");
+    state.log.push({
+      id: r.id, taskId: r.taskId,
+      plannedMinutes: r.plannedFocusMinutes,
+      actualMinutes: round1((r.focusEndTs - r.startTs)/60000),
+      startTs: r.startTs, endTs: r.focusEndTs,
+      status: status,
+      internalViolations: r.internalViolations,
+      externalEvents: r.externalEvents,
+      flowExtensions: r.flowExtensions,
+      breakKind: r.breakKind
+    });
+    if(status !== "void" && r.taskId){
+      var t = state.tasks.find(function(t){ return t.id === r.taskId; });
+      if(t) t.actualPomodoros = (t.actualPomodoros||0) + 1;
+    }
+    if(status !== "void") session.cycleCount += 1;
+  }
+
+  function startFocus(){
+    if(session.phase !== "idle") return;
+    var preset = getActivePresetDurations();
+    var now = Date.now();
+    session.phase = "focus";
+    session.status = "running";
+    session.breakKind = null;
+    session.targetEndTs = now + preset.focus * 60000;
+    session.remainingMsAtPause = null;
+    session.pausedAt = null;
+    session.pauseAwaitingTag = false;
+    session.record = {
+      id: uid(), taskId: getActiveTaskId(), plannedFocusMinutes: preset.focus, startTs: now, focusEndTs: null,
+      internalViolations: 0, externalEvents: 0, flowExtensions: 0, flowExtensionsConsecutive: 0,
+      pauses: [], abandoned: false, forcedVoid: false, breakSkipped: false, breakOverrunMinutes: 0,
+      plannedBreakMinutes: 0, breakKind: null
+    };
+    persistAndRender();
+    announce("Focus session started, " + preset.focus + " minutes.");
+  }
+
+  function pauseFocus(){
+    if(session.phase !== "focus" || session.status !== "running") return;
+    var now = Date.now();
+    session.remainingMsAtPause = session.targetEndTs - now;
+    session.status = "paused";
+    session.pausedAt = now;
+    session.pauseAwaitingTag = true;
+    session.record.pauses.push({ start: now, end: null, tag: null });
+    persistAndRender();
+    announce("Paused.");
+  }
+
+  function tagPause(tag){
+    if(!session.record || !session.pauseAwaitingTag) return;
+    var p = session.record.pauses[session.record.pauses.length - 1];
+    if(!p || p.tag) return;
+    p.tag = tag;
+    if(tag === "internal") session.record.internalViolations += 1;
+    else session.record.externalEvents += 1;
+    session.pauseAwaitingTag = false;
+    persistAndRender();
+  }
+
+  function resumeFocus(){
+    if(session.phase !== "focus" || session.status !== "paused") return;
+    var now = Date.now();
+    var p = session.record.pauses[session.record.pauses.length - 1];
+    if(p && p.end === null){
+      p.end = now;
+      var dur = p.end - p.start;
+      if(dur > 5*60*1000) session.record.forcedVoid = true;
+      if(p.tag === null){ p.tag = "external"; session.record.externalEvents += 1; }
+    }
+    session.pauseAwaitingTag = false;
+    session.targetEndTs = now + session.remainingMsAtPause;
+    session.remainingMsAtPause = null;
+    session.pausedAt = null;
+    session.status = "running";
+    persistAndRender();
+    announce("Resumed.");
+  }
+
+  function abandonFocus(){
+    if(session.phase !== "focus") return;
+    var now = Date.now();
+    if(session.status === "paused"){
+      var p = session.record.pauses[session.record.pauses.length - 1];
+      if(p && p.end === null){
+        p.end = now;
+        if(now - p.start > 5*60*1000) session.record.forcedVoid = true;
+        if(p.tag === null){ p.tag = "external"; session.record.externalEvents += 1; }
+      }
+    }
+    session.record.abandoned = true;
+    session.record.internalViolations += 2;
+    session.record.focusEndTs = now;
+    pushLogEntry(session.record);
+    session.record = null;
+    session.phase = "idle";
+    session.status = null;
+    session.targetEndTs = null;
+    session.remainingMsAtPause = null;
+    session.pausedAt = null;
+    session.pauseAwaitingTag = false;
+    persistAndRender();
+    announce("Session abandoned.");
+  }
+
+  function completeFocus(now){
+    session.phase = "focus-guard";
+    session.status = null;
+    session.focusGuardOvertimeStartTs = now;
+    playChime();
+    notify("Focus session complete", "Still in flow?");
+    announce("Focus session complete. Still in flow, or take the break?");
+    persistAndRender();
+  }
+
+  function flowGuardExtend(){
+    if(!session.record || session.record.flowExtensionsConsecutive >= 2) return;
+    var now = Date.now();
+    session.record.flowExtensions += 1;
+    session.record.flowExtensionsConsecutive += 1;
+    state.flowExtensionLog.push({ id: uid(), ts: now, sessionId: session.record.id });
+    session.phase = "focus";
+    session.status = "running";
+    session.targetEndTs = now + 10*60000;
+    persistAndRender();
+    announce("Extended 10 minutes.");
+  }
+
+  function flowGuardTakeBreak(){
+    if(!session.record) return;
+    var now = Date.now();
+    session.record.focusEndTs = now;
+    session.record.flowExtensionsConsecutive = 0;
+    beginBreak(now);
+  }
+
+  function skipBreak(){
+    if(session.phase !== "break") return;
+    var now = Date.now();
+    session.record.breakSkipped = true;
+    session.record.internalViolations += 1;
+    finalizeBreak();
+  }
+
+  function finalizeBreak(){
+    pushLogEntry(session.record);
+    session.record = null;
+    session.phase = "idle";
+    session.breakKind = null;
+    session.targetEndTs = null;
+    session.breakOverStartTs = null;
+    persistAndRender();
+    if(state.settings.autoStartNext) startFocus();
+  }
+
+  function completeBreakCountdown(now){
+    session.phase = "break-over";
+    session.breakOverStartTs = now;
+    playChime();
+    notify("Break's over", "Ready when you are.");
+    announce("Break complete.");
+    if(state.settings.autoStartNext){
+      finalizeBreak();
+    } else {
+      persistAndRender();
+    }
+  }
+
+  function startNextFromBreakOver(){
+    if(session.phase !== "break-over") return;
+    var now = Date.now();
+    var overrunMin = (now - session.breakOverStartTs) / 60000;
+    if(overrunMin > 2){
+      session.record.internalViolations += 1;
+      session.record.breakOverrunMinutes = round1(overrunMin);
+    }
+    pushLogEntry(session.record);
+    session.record = null;
+    session.phase = "idle";
+    session.breakKind = null;
+    session.breakOverStartTs = null;
+    startFocus();
+  }
+
+  function logInterruption(type, note){
+    if(session.phase !== "focus" || session.status !== "running") return;
+    var now = Date.now();
+    state.interruptionLog.push({ id: uid(), ts: now, type: type, note: (note||"").slice(0,240), sessionId: session.record ? session.record.id : null });
+    if(session.record){
+      if(type === "internal") session.record.internalViolations += 1;
+      else session.record.externalEvents += 1;
+    }
+    session.interruptPopoverOpen = false;
+    persistAndRender();
+    announce(type === "internal" ? "Interruption logged: internal." : "Interruption logged: external.");
+  }
+
+  // ---------- Tick (drives state off wall clock, never accumulation) ----------
+  function tick(){
+    var now = Date.now();
+    if(session.phase === "focus"){
+      if(session.status === "paused" && session.pausedAt && session.record && !session.record.forcedVoid){
+        if(now - session.pausedAt > 5*60*1000){
+          session.record.forcedVoid = true;
+          saveState();
+        }
+      } else if(session.status === "running" && session.targetEndTs && now >= session.targetEndTs){
+        completeFocus(now);
+        return;
+      }
+    } else if(session.phase === "break" && session.targetEndTs && now >= session.targetEndTs){
+      completeBreakCountdown(now);
+      return;
+    }
+    renderTimer();
+  }
+
+  function persistAndRender(){ saveState(); render(); }
+
+  // ---------- Rendering: Timer ----------
+  var CIRC = 2 * Math.PI * 90;
+  function renderTimer(){
+    var now = Date.now();
+    var mode = "focus", remainingMs = 0, plannedMs = 1, overtime = false, overtimeMs = 0;
+    var modeLabelText = "Focus";
+
+    if(session.phase === "idle"){
+      var preset = getActivePresetDurations();
+      remainingMs = preset.focus * 60000; plannedMs = remainingMs;
+      mode = "focus"; modeLabelText = "Focus";
+    } else if(session.phase === "focus"){
+      plannedMs = session.record.plannedFocusMinutes * 60000;
+      remainingMs = session.status === "running" ? (session.targetEndTs - now) : session.remainingMsAtPause;
+      mode = "focus"; modeLabelText = session.status === "paused" ? "Focus — paused" : "Focus";
+    } else if(session.phase === "focus-guard"){
+      mode = "focus"; modeLabelText = "Focus — overtime";
+      overtime = true;
+      overtimeMs = now - session.focusGuardOvertimeStartTs;
+    } else if(session.phase === "break"){
+      plannedMs = session.record.plannedBreakMinutes * 60000;
+      remainingMs = session.targetEndTs - now;
+      mode = session.breakKind === "long" ? "long" : "short";
+      modeLabelText = (session.breakKind === "long" ? "Long break" : "Short break");
+    } else if(session.phase === "break-over"){
+      mode = session.breakKind === "long" ? "long" : "short";
+      modeLabelText = (session.breakKind === "long" ? "Long break" : "Short break") + " — over";
+      overtime = true;
+      overtimeMs = now - session.breakOverStartTs;
+    }
+
+    document.body.setAttribute("data-mode", mode);
+    $("#mode-label-text").textContent = modeLabelText;
+
+    var fraction;
+    if(overtime) fraction = 1;
+    else if(session.phase === "idle") fraction = 0;
+    else fraction = clamp(1 - (remainingMs / plannedMs), 0, 1);
+    var offset = CIRC * (1 - fraction);
+    var ring = $("#ring-progress");
+    ring.style.strokeDasharray = CIRC.toFixed(2);
+    ring.style.strokeDashoffset = offset.toFixed(2);
+
+    var readout = $("#time-readout");
+    var sub = $("#time-sub");
+    if(overtime){
+      readout.textContent = "+" + fmtMMSS(overtimeMs);
+      sub.textContent = "beyond plan";
+    } else {
+      readout.textContent = fmtMMSS(Math.max(0, remainingMs));
+      sub.textContent = session.phase === "idle" ? "ready" : (session.status === "paused" ? "paused" : "");
+    }
+
+    document.title = (session.phase === "idle") ? "DevFocus" :
+      (overtime ? "+" + fmtMMSS(overtimeMs) + " · DevFocus" : fmtMMSS(Math.max(0,remainingMs)) + " · DevFocus");
+
+    // active task line
+    var activeTask = state.tasks.find(function(t){ return t.active; });
+    $("#active-task-line").innerHTML = activeTask
+      ? "Working on <strong>" + escapeHtml(activeTask.title) + "</strong>"
+      : "No active task selected";
+
+    renderControls();
+    renderCycleNote();
+    renderStatusNote();
+
+    $("#preset-select").disabled = session.phase !== "idle";
+  }
+
+  function renderCycleNote(){
+    var n = state.settings.sessionsUntilLongBreak || 4;
+    var done = session.cycleCount % n;
+    $("#cycle-note").textContent = "Focus session " + (done+1) + " of " + n + " before a long break.";
+  }
+
+  function renderStatusNote(){
+    var note = "";
+    if(session.record && session.record.forcedVoid){
+      note = "This session is recorded as Void — paused over 5 minutes.";
+    } else if(session.record && session.record.flowExtensionsConsecutive >= 2 && session.phase === "focus-guard"){
+      note = "";
+    }
+    $("#status-note").textContent = note;
+  }
+
+  function renderControls(){
+    var c = $("#controls");
+    c.innerHTML = "";
+    var pauseTagPanel = $("#pause-tag-panel");
+    var flowPanel = $("#flow-guard-panel");
+    var interruptPanel = $("#interrupt-panel");
+
+    pauseTagPanel.hidden = !(session.phase === "focus" && session.status === "paused" && session.pauseAwaitingTag);
+    flowPanel.hidden = session.phase !== "focus-guard";
+    interruptPanel.hidden = !session.interruptPopoverOpen;
+
+    function mk(label, id, cls, handler, extraAttrs){
+      var b = document.createElement("button");
+      b.textContent = label;
+      b.className = "btn " + (cls||"");
+      b.id = id;
+      if(extraAttrs) Object.keys(extraAttrs).forEach(function(k){ b.setAttribute(k, extraAttrs[k]); });
+      b.addEventListener("click", handler);
+      c.appendChild(b);
+      return b;
+    }
+
+    if(session.phase === "idle"){
+      mk("Start focus", "btn-start", "btn-primary", startFocus);
+    } else if(session.phase === "focus" && session.status === "running"){
+      mk("Pause", "btn-pause", "btn-ghost", pauseFocus);
+      mk("Interrupted", "btn-interrupted", "btn-ghost", toggleInterruptPopover);
+      mk("Abandon", "btn-abandon", "btn-quiet", confirmAbandon);
+    } else if(session.phase === "focus" && session.status === "paused"){
+      mk("Resume", "btn-resume", "btn-primary", resumeFocus);
+      mk("Abandon", "btn-abandon", "btn-quiet", confirmAbandon);
+    } else if(session.phase === "focus-guard"){
+      mk("Interrupted", "btn-interrupted", "btn-ghost", toggleInterruptPopover);
+    } else if(session.phase === "break"){
+      mk("Skip break", "btn-skip", "btn-ghost", skipBreak);
+    } else if(session.phase === "break-over"){
+      mk("Start next focus", "btn-start-next", "btn-primary", startNextFromBreakOver);
+    }
+
+    if(flowPanel.hidden === false){
+      var text = "Session done — still in flow?";
+      var extendBtn = $("#btn-extend");
+      if(session.record.flowExtensionsConsecutive >= 2){
+        text = "Break enforced after two extensions. Fatigue accumulates, and resumption cost is lower at a clean stopping point.";
+        extendBtn.hidden = true;
+      } else {
+        extendBtn.hidden = false;
+      }
+      $("#flow-guard-text").textContent = text;
+    }
+  }
+
+  function toggleInterruptPopover(){
+    session.interruptPopoverOpen = !session.interruptPopoverOpen;
+    render();
+  }
+
+  function confirmAbandon(){
+    if(window.confirm("Abandon this focus session? It will be recorded as Void.")){
+      abandonFocus();
+    }
+  }
+
+  // ---------- Rendering: Tasks ----------
+  function renderTasks(){
+    var list = $("#task-list");
+    if(!state.tasks.length){
+      list.innerHTML = '<li class="empty-state">No tasks yet. Press <kbd>N</kbd> or use the form above to add one.</li>';
+      return;
+    }
+    list.innerHTML = state.tasks.map(function(t, i){
+      var tagHtml = t.tag ? '<span class="tag">' + escapeHtml(t.tag) + '</span>' : "";
+      var countText = (t.actualPomodoros||0) + (t.estimate ? (" / " + t.estimate) : "") + " pomodoros";
+      return '<li class="task-row ' + (t.done?"is-done ":"") + (t.active?"is-active":"") + '" draggable="true" data-id="' + t.id + '">' +
+        '<button class="task-drag-handle" aria-hidden="true" tabindex="-1">☷</button>' +
+        '<input type="checkbox" class="task-check" data-id="' + t.id + '" ' + (t.done?"checked":"") + ' aria-label="Mark ' + escapeHtml(t.title) + ' done">' +
+        '<div class="task-main"><div class="task-title">' + escapeHtml(t.title) + '</div>' +
+        '<div class="task-meta">' + tagHtml + '<span class="task-count">' + countText + '</span></div></div>' +
+        '<button class="btn-ghost btn-sm task-active-btn" data-id="' + t.id + '" aria-pressed="' + t.active + '">' + (t.active?"Active":"Set active") + '</button>' +
+        '<div class="task-order-btns">' +
+        '<button class="btn-icon task-up" data-id="' + t.id + '" aria-label="Move up" ' + (i===0?"disabled":"") + '>↑</button>' +
+        '<button class="btn-icon task-down" data-id="' + t.id + '" aria-label="Move down" ' + (i===state.tasks.length-1?"disabled":"") + '>↓</button>' +
+        '</div>' +
+        '<button class="btn-icon task-delete" data-id="' + t.id + '" aria-label="Delete task">✕</button>' +
+        '</li>';
+    }).join("");
+  }
+
+  function addTask(title, estimate, tag){
+    title = title.trim();
+    if(!title) return;
+    state.tasks.push({
+      id: uid(), title: title, estimate: estimate || null, tag: tag || null,
+      active: state.tasks.length === 0, done: false, actualPomodoros: 0, createdAt: Date.now()
+    });
+    persistAndRender();
+  }
+
+  $("#task-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var title = $("#task-title-input").value;
+    var estimate = parseInt($("#task-estimate-input").value, 10);
+    var tag = $("#task-tag-input").value;
+    addTask(title, isNaN(estimate) ? null : estimate, tag);
+    $("#task-title-input").value = "";
+    $("#task-estimate-input").value = "";
+    $("#task-tag-input").value = "";
+    $("#task-title-input").focus();
+  });
+
+  $("#task-list").addEventListener("click", function(e){
+    var el = e.target.closest("button");
+    if(!el) return;
+    var id = el.getAttribute("data-id");
+    if(!id) return;
+    var idx = state.tasks.findIndex(function(t){ return t.id === id; });
+    if(idx === -1) return;
+    if(el.classList.contains("task-active-btn")){
+      state.tasks.forEach(function(t){ t.active = false; });
+      state.tasks[idx].active = true;
+      persistAndRender();
+    } else if(el.classList.contains("task-up") && idx > 0){
+      var a = state.tasks[idx-1]; state.tasks[idx-1] = state.tasks[idx]; state.tasks[idx] = a;
+      persistAndRender();
+    } else if(el.classList.contains("task-down") && idx < state.tasks.length-1){
+      var b = state.tasks[idx+1]; state.tasks[idx+1] = state.tasks[idx]; state.tasks[idx] = b;
+      persistAndRender();
+    } else if(el.classList.contains("task-delete")){
+      state.tasks.splice(idx, 1);
+      persistAndRender();
+    }
+  });
+  $("#task-list").addEventListener("change", function(e){
+    var el = e.target;
+    if(!el.classList.contains("task-check")) return;
+    var id = el.getAttribute("data-id");
+    var t = state.tasks.find(function(t){ return t.id === id; });
+    if(t){ t.done = el.checked; persistAndRender(); }
+  });
+
+  var dragSrcId = null;
+  $("#task-list").addEventListener("dragstart", function(e){
+    var li = e.target.closest("li[data-id]");
+    if(!li) return;
+    dragSrcId = li.getAttribute("data-id");
+    e.dataTransfer.effectAllowed = "move";
+  });
+  $("#task-list").addEventListener("dragover", function(e){ e.preventDefault(); });
+  $("#task-list").addEventListener("drop", function(e){
+    e.preventDefault();
+    var li = e.target.closest("li[data-id]");
+    if(!li || !dragSrcId) return;
+    var targetId = li.getAttribute("data-id");
+    if(targetId === dragSrcId) return;
+    var srcIdx = state.tasks.findIndex(function(t){ return t.id === dragSrcId; });
+    var tgtIdx = state.tasks.findIndex(function(t){ return t.id === targetId; });
+    if(srcIdx === -1 || tgtIdx === -1) return;
+    var moved = state.tasks.splice(srcIdx, 1)[0];
+    state.tasks.splice(tgtIdx, 0, moved);
+    dragSrcId = null;
+    persistAndRender();
+  });
+
+  // ---------- Rendering: Stats ----------
+  function computeToday(){
+    var today = Date.now();
+    var logsToday = state.log.filter(function(l){ return isSameDay(l.startTs, today); });
+    var focusMinutes = logsToday.reduce(function(s,l){ return s + l.actualMinutes; }, 0);
+    var interruptionsToday = state.interruptionLog.filter(function(x){ return isSameDay(x.ts, today); });
+    var internalInt = interruptionsToday.filter(function(x){ return x.type === "internal"; }).length;
+    var externalInt = interruptionsToday.filter(function(x){ return x.type === "external"; }).length;
+    var extToday = state.flowExtensionLog.filter(function(x){ return isSameDay(x.ts, today); }).length;
+    return { focusMinutes: round1(focusMinutes), sessionsCompleted: logsToday.length, internalInt: internalInt, externalInt: externalInt, extToday: extToday };
+  }
+
+  function lastNDays(n){
+    var days = []; var today = startOfDay(Date.now());
+    for(var i=n-1;i>=0;i--) days.push(today - i*86400000);
+    return days;
+  }
+
+  function renderTodayStats(){
+    var s = computeToday();
+    var tile = function(num, label){ return '<div class="stat-tile"><div class="num">'+num+'</div><div class="label">'+label+'</div></div>'; };
+    $("#today-stats").innerHTML =
+      tile(s.focusMinutes + "m", "Focus minutes") +
+      tile(s.sessionsCompleted, "Sessions run") +
+      tile(s.internalInt, "Internal interruptions") +
+      tile(s.externalInt, "External interruptions") +
+      tile(s.extToday, "Flow extensions used");
+  }
+
+  function renderWeekChart(){
+    var days = lastNDays(7);
+    var totals = days.map(function(d){
+      return round1(state.log.filter(function(l){ return isSameDay(l.startTs, d); }).reduce(function(s,l){ return s+l.actualMinutes; }, 0));
+    });
+    var wrap = $("#week-chart");
+    if(state.log.length === 0){
+      wrap.innerHTML = '<p class="empty-state">No sessions yet — run a focus block to see this chart fill in.</p>';
+      return;
+    }
+    var max = Math.max(1, Math.max.apply(null, totals));
+    var w = 560, h = 160, pad = 24, barW = (w - pad*2) / 7 - 10;
+    var bars = days.map(function(d, i){
+      var val = totals[i];
+      var barH = (val / max) * (h - pad*2 - 16);
+      var x = pad + i * ((w-pad*2)/7);
+      var y = h - pad - barH;
+      var label = new Date(d).toLocaleDateString(undefined, { weekday: "short" });
+      return '<rect class="bar-track" x="'+x+'" y="'+pad+'" width="'+barW+'" height="'+(h-pad*2)+'" rx="3"></rect>' +
+             '<rect class="bar" x="'+x+'" y="'+y+'" width="'+barW+'" height="'+Math.max(barH,1)+'" rx="3"></rect>' +
+             '<text x="'+(x+barW/2)+'" y="'+(h-4)+'" text-anchor="middle">'+label+'</text>' +
+             '<text x="'+(x+barW/2)+'" y="'+(y-6)+'" text-anchor="middle">'+(val>0?val:"")+'</text>';
+    }).join("");
+    wrap.innerHTML = '<svg class="chart" viewBox="0 0 '+w+' '+h+'" width="100%" style="max-width:'+w+'px">'+bars+'</svg>';
+  }
+
+  function renderHeatmap(){
+    var el = $("#heatmap");
+    if(state.log.length === 0){
+      el.innerHTML = '<p class="empty-state">No sessions yet — your peak focus hours will show up here.</p>';
+      return;
+    }
+    var buckets = new Array(24).fill(0);
+    state.log.forEach(function(l){
+      var h = new Date(l.startTs).getHours();
+      buckets[h] += l.actualMinutes;
+    });
+    var max = Math.max.apply(null, buckets) || 1;
+    var cells = buckets.map(function(v){
+      var t = v / max;
+      var bg = t === 0 ? "var(--ring-track)" : "color-mix(in srgb, var(--accent) " + Math.round(10 + t*80) + "%, var(--ring-track))";
+      return '<div class="heatmap-cell" style="background:'+bg+'" title="'+Math.round(v)+' min"></div>';
+    }).join("");
+    var hours = buckets.map(function(_, h){ return '<span>'+(h%3===0?h:"")+'</span>'; }).join("");
+    el.innerHTML = '<div class="heatmap-row">'+cells+'</div><div class="heatmap-hours">'+hours+'</div>';
+  }
+
+  function renderEstimation(){
+    var done = state.tasks.filter(function(t){ return t.done && t.estimate && t.actualPomodoros > 0; });
+    var el = $("#estimation-block");
+    if(!done.length){
+      el.innerHTML = '<p class="empty-state">Complete a task with an estimate to see your calibration here.</p>';
+      return;
+    }
+    var avg = done.reduce(function(s,t){ return s + (t.actualPomodoros / t.estimate); }, 0) / done.length;
+    var pct = Math.round(avg * 100);
+    el.innerHTML = '<div class="stat-tile" style="max-width:220px"><div class="num">' + pct + '%</div>' +
+      '<div class="label">actual ÷ estimated pomodoros, averaged across ' + done.length + ' completed task' + (done.length===1?"":"s") + '</div></div>';
+  }
+
+  function renderIntegrity(){
+    var clean = state.log.filter(function(l){ return l.status === "clean"; }).length;
+    var flawed = state.log.filter(function(l){ return l.status === "flawed"; }).length;
+    var voidC = state.log.filter(function(l){ return l.status === "void"; }).length;
+    var total = clean + flawed + voidC;
+    var rate = total ? Math.round((clean/total)*100) : null;
+    var tile = function(num, label){ return '<div class="stat-tile"><div class="num">'+num+'</div><div class="label">'+label+'</div></div>'; };
+    $("#integrity-stats").innerHTML =
+      tile(rate === null ? "—" : rate + "%", "Integrity rate") +
+      tile(clean, "Clean sessions") +
+      tile(flawed, "Flawed sessions") +
+      tile(voidC, "Void sessions");
+
+    var chartEl = $("#integrity-chart");
+    if(total === 0){
+      chartEl.innerHTML = '<p class="empty-state">No finalized sessions yet.</p>';
+      return;
+    }
+    var days = lastNDays(7);
+    var w = 560, h = 160, pad = 24;
+    var perDay = days.map(function(d){
+      var entries = state.log.filter(function(l){ return isSameDay(l.startTs, d); });
+      var internal = entries.reduce(function(s,l){ return s + l.internalViolations; }, 0);
+      var external = entries.reduce(function(s,l){ return s + l.externalEvents; }, 0);
+      return { internal: internal, external: external };
+    });
+    var max = Math.max(1, Math.max.apply(null, perDay.map(function(d){ return d.internal + d.external; })));
+    var barW = (w - pad*2)/7 - 10;
+    var bars = days.map(function(d,i){
+      var v = perDay[i];
+      var totalH = ((v.internal+v.external)/max) * (h-pad*2-16);
+      var internalH = v.internal ? (v.internal/(v.internal+v.external)) * totalH : 0;
+      var externalH = totalH - internalH;
+      var x = pad + i*((w-pad*2)/7);
+      var yBase = h - pad;
+      var label = new Date(d).toLocaleDateString(undefined, { weekday: "short" });
+      var rects = '<rect class="bar-track" x="'+x+'" y="'+pad+'" width="'+barW+'" height="'+(h-pad*2)+'" rx="3"></rect>';
+      if(externalH > 0) rects += '<rect class="bar-external" x="'+x+'" y="'+(yBase-externalH)+'" width="'+barW+'" height="'+externalH+'" rx="2"></rect>';
+      if(internalH > 0) rects += '<rect class="bar-internal" x="'+x+'" y="'+(yBase-externalH-internalH)+'" width="'+barW+'" height="'+internalH+'" rx="2"></rect>';
+      rects += '<text x="'+(x+barW/2)+'" y="'+(h-4)+'" text-anchor="middle">'+label+'</text>';
+      return rects;
+    }).join("");
+    chartEl.innerHTML = '<svg class="chart" viewBox="0 0 '+w+' '+h+'" width="100%" style="max-width:'+w+'px">'+bars+'</svg>';
+  }
+
+  function renderStats(){
+    renderTodayStats();
+    renderWeekChart();
+    renderHeatmap();
+    renderEstimation();
+    renderIntegrity();
+  }
+
+  // ---------- Rendering: Settings ----------
+  function renderPresetEditGrid(){
+    var grid = $("#preset-edit-grid");
+    grid.querySelectorAll(".preset-row-el").forEach(function(el){ el.remove(); });
+    var names = { classic:"Classic", deep:"Deep Work", sprint:"Sprint", custom:"Custom" };
+    Object.keys(names).forEach(function(key){
+      var p = state.settings.presets[key];
+      var rowFrag = document.createElement("span");
+      rowFrag.className = "preset-row-el"; rowFrag.textContent = names[key];
+      grid.appendChild(rowFrag);
+      ["focus","short","long"].forEach(function(field){
+        var input = document.createElement("input");
+        input.type = "number"; input.min = "1"; input.max = "240";
+        input.value = p[field];
+        input.className = "preset-row-el";
+        input.setAttribute("aria-label", names[key] + " " + field + " minutes");
+        input.addEventListener("change", function(){
+          var v = parseInt(input.value, 10);
+          if(!isNaN(v) && v > 0) state.settings.presets[key][field] = v;
+          else input.value = state.settings.presets[key][field];
+          saveState();
+          if(session.phase === "idle") renderTimer();
+        });
+        grid.appendChild(input);
+      });
+    });
+  }
+
+  function renderSettings(){
+    $("#preset-select").value = state.settings.activePreset;
+    $("#setting-sessions-until-long").value = state.settings.sessionsUntilLongBreak;
+    $("#setting-autostart").checked = state.settings.autoStartNext;
+    $("#setting-sound").checked = state.settings.soundOn;
+    $("#setting-volume").value = state.settings.volume;
+    $("#setting-notifications").checked = state.settings.notificationsOn;
+    $("#setting-theme").value = state.settings.theme;
+  }
+
+  // ---------- Full render ----------
+  function render(){
+    renderTimer();
+    renderTasks();
+    renderStats();
+    renderSettings();
+    renderPresetEditGrid();
+  }
+
+  // ---------- View switching ----------
+  var views = ["timer","tasks","stats","settings"];
+  function switchView(name){
+    views.forEach(function(v){
+      $("#view-"+v).hidden = v !== name;
+      $("#view-"+v).classList.toggle("active", v === name);
+      $("#tab-"+v).setAttribute("aria-selected", v === name ? "true" : "false");
+    });
+    if(name === "stats") renderStats();
+  }
+  document.querySelectorAll("nav.tabs button").forEach(function(btn){
+    btn.addEventListener("click", function(){ switchView(btn.getAttribute("data-view")); });
+  });
+
+  // ---------- Wiring: timer panels ----------
+  $("#btn-tag-internal").addEventListener("click", function(){ tagPause("internal"); });
+  $("#btn-tag-external").addEventListener("click", function(){ tagPause("external"); });
+  $("#btn-take-break").addEventListener("click", flowGuardTakeBreak);
+  $("#btn-extend").addEventListener("click", flowGuardExtend);
+  $("#btn-interrupt-internal").addEventListener("click", function(){
+    logInterruption("internal", $("#interrupt-note").value);
+    $("#interrupt-note").value = "";
+  });
+  $("#btn-interrupt-external").addEventListener("click", function(){
+    logInterruption("external", $("#interrupt-note").value);
+    $("#interrupt-note").value = "";
+  });
+  $("#preset-select").addEventListener("change", function(){
+    state.settings.activePreset = this.value;
+    saveState();
+    if(session.phase === "idle") renderTimer();
+  });
+
+  // ---------- Wiring: settings ----------
+  $("#setting-sessions-until-long").addEventListener("change", function(){
+    var v = clamp(parseInt(this.value,10)||4, 2, 12);
+    state.settings.sessionsUntilLongBreak = v;
+    this.value = v;
+    saveState();
+    renderTimer();
+  });
+  $("#setting-autostart").addEventListener("change", function(){ state.settings.autoStartNext = this.checked; saveState(); });
+  $("#setting-sound").addEventListener("change", function(){
+    state.settings.soundOn = this.checked;
+    if(this.checked) ensureAudioCtx();
+    saveState();
+  });
+  $("#setting-volume").addEventListener("input", function(){ state.settings.volume = parseFloat(this.value); saveState(); });
+  $("#setting-notifications").addEventListener("change", function(){
+    var on = this.checked;
+    state.settings.notificationsOn = on;
+    if(on && typeof Notification !== "undefined" && Notification.permission === "default"){
+      Notification.requestPermission().then(function(){ saveState(); });
+    }
+    saveState();
+  });
+  $("#setting-theme").addEventListener("change", function(){
+    state.settings.theme = this.value;
+    document.documentElement.setAttribute("data-theme", this.value);
+    saveState();
+  });
+
+  // Quick theme toggle button cycles system -> light -> dark -> system
+  $("#btn-theme").addEventListener("click", function(){
+    var order = ["system","light","dark"];
+    var idx = (order.indexOf(state.settings.theme)+1) % order.length;
+    state.settings.theme = order[idx];
+    document.documentElement.setAttribute("data-theme", state.settings.theme);
+    saveState();
+    renderSettings();
+  });
+
+  // ---------- Data: export / import / reset ----------
+  $("#btn-export").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "devfocus-export-" + new Date().toISOString().slice(0,10) + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+  $("#btn-import").addEventListener("click", function(){ $("#import-file").click(); });
+  $("#import-file").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var parsed = JSON.parse(reader.result);
+        state = migrateState(parsed);
+        session = state.session;
+        saveState();
+        document.documentElement.setAttribute("data-theme", state.settings.theme);
+        render();
+        announce("Data imported.");
+      } catch(err){
+        window.alert("Import failed — that file isn't valid DevFocus data.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+  $("#btn-reset").addEventListener("click", function(){ $("#reset-confirm-row").hidden = false; });
+  $("#btn-reset-cancel").addEventListener("click", function(){ $("#reset-confirm-row").hidden = true; });
+  $("#btn-reset-confirm").addEventListener("click", function(){
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+    state = defaultState();
+    session = state.session;
+    document.documentElement.setAttribute("data-theme", state.settings.theme);
+    $("#reset-confirm-row").hidden = true;
+    render();
+    announce("All data reset.");
+  });
+
+  // ---------- Shortcuts overlay ----------
+  function openShortcuts(){ $("#shortcuts-overlay").hidden = false; $("#btn-close-shortcuts").focus(); }
+  function closeShortcuts(){ $("#shortcuts-overlay").hidden = true; }
+  $("#btn-shortcuts").addEventListener("click", openShortcuts);
+  $("#btn-close-shortcuts").addEventListener("click", closeShortcuts);
+  $("#shortcuts-overlay").addEventListener("click", function(e){ if(e.target === this) closeShortcuts(); });
+
+  function closeOverlays(){
+    closeShortcuts();
+    if(session.interruptPopoverOpen){ session.interruptPopoverOpen = false; render(); }
+    $("#reset-confirm-row").hidden = true;
+  }
+
+  // ---------- Keyboard shortcuts ----------
+  function isEditableTarget(el){
+    if(!el) return false;
+    var tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+  }
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ closeOverlays(); return; }
+    if(isEditableTarget(e.target)) return;
+    if(e.target && e.target.tagName === "BUTTON") return;
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+
+    switch(e.key){
+      case " ":
+        e.preventDefault();
+        if(session.phase === "idle") startFocus();
+        else if(session.phase === "focus" && session.status === "running") pauseFocus();
+        else if(session.phase === "focus" && session.status === "paused") resumeFocus();
+        else if(session.phase === "break-over") startNextFromBreakOver();
+        break;
+      case "a": case "A":
+        if(session.phase === "focus") confirmAbandon();
+        break;
+      case "s": case "S":
+        if(session.phase === "break") skipBreak();
+        else if(session.phase === "break-over") startNextFromBreakOver();
+        break;
+      case "i": case "I":
+        if(session.phase === "focus" && session.status === "running") toggleInterruptPopover();
+        break;
+      case "n": case "N":
+        switchView("tasks");
+        window.setTimeout(function(){ $("#task-title-input").focus(); }, 0);
+        break;
+      case "?":
+        openShortcuts();
+        break;
+    }
+  });
+
+  // ---------- Init ----------
+  document.documentElement.setAttribute("data-theme", state.settings.theme);
+  render();
+  tick();
+  setInterval(tick, 250);
+})();
+</script>
+</body>
+</html>
